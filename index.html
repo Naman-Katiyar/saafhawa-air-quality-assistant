@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SaafHawa — Urban Air Quality Assistant</title>
+<meta name="description" content="Live air quality, personalised family routines and indoor air hacks to help your family beat severe winter smog.">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="14" fill="none" stroke="currentColor" stroke-width="2.5"/><path d="M8 19c3-1 5-4 8-4s4 2 8 1" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M9 12c2.5-.5 4-2.5 7-2.5" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+      <div>
+        <div class="brand-name">SaafHawa</div>
+        <div class="brand-sub">Urban Air Quality Assistant</div>
+      </div>
+    </div>
+    <div class="topbar-note">Helping families beat severe winter smog</div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="search-block">
+    <label class="search-label" for="cityInput">Your city</label>
+    <div class="search-row">
+      <div class="search-field">
+        <input id="cityInput" type="text" placeholder="Search a city — try Delhi, Kanpur, Lucknow…" autocomplete="off">
+        <div id="suggestions" class="suggestions" hidden></div>
+      </div>
+      <button id="locateBtn" class="btn btn-secondary" type="button">Use my location</button>
+    </div>
+    <div class="quick-cities">
+      <span>Quick:</span>
+      <button type="button" class="chip" data-city="Delhi" data-lat="28.6139" data-lon="77.2090">Delhi</button>
+      <button type="button" class="chip" data-city="Kanpur" data-lat="26.4652" data-lon="80.3497">Kanpur</button>
+      <button type="button" class="chip" data-city="Lucknow" data-lat="26.8467" data-lon="80.9462">Lucknow</button>
+      <button type="button" class="chip" data-city="Mumbai" data-lat="19.0760" data-lon="72.8777">Mumbai</button>
+      <button type="button" class="chip" data-city="Bengaluru" data-lat="12.9716" data-lon="77.5946">Bengaluru</button>
+    </div>
+    <p id="statusLine" class="status-line" role="status"></p>
+  </section>
+
+  <section id="nowCard" class="card now-card" hidden>
+    <div class="now-main">
+      <div>
+        <div class="now-city" id="nowCity">—</div>
+        <div class="now-updated" id="nowUpdated">—</div>
+        <div class="now-message" id="nowMessage">—</div>
+      </div>
+      <div class="now-aqi">
+        <div class="aqi-number" id="aqiNumber">—</div>
+        <div class="aqi-label">US AQI</div>
+        <div class="aqi-category" id="aqiCategory">—</div>
+      </div>
+    </div>
+    <div class="now-stats">
+      <div class="stat"><span class="stat-name">PM2.5</span><span class="stat-value" id="pm25Value">—</span><span class="stat-unit">µg/m³</span></div>
+      <div class="stat"><span class="stat-name">PM10</span><span class="stat-value" id="pm10Value">—</span><span class="stat-unit">µg/m³</span></div>
+      <div class="stat"><span class="stat-name">Best outdoor window</span><span class="stat-value stat-wide" id="bestWindow">—</span></div>
+      <div class="stat"><span class="stat-name">Mask advice</span><span class="stat-value stat-wide" id="maskAdvice">—</span></div>
+    </div>
+    <div class="chart-block">
+      <div class="chart-title">AQI — next 24 hours</div>
+      <canvas id="aqiChart" height="140"></canvas>
+      <div class="chart-legend"><span class="dot dot-best"></span> Cleanest stretch &nbsp;·&nbsp; Bar colour = AQI category at that hour</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Your family</h2>
+    <p class="card-intro">Tell SaafHawa who is at home. Your daily plan below is built from the live AQI and these needs — nothing is uploaded; it stays in your browser.</p>
+    <div class="profile-grid" id="profileGrid">
+      <label class="profile-option"><input type="checkbox" value="children"> Young children (under 12)</label>
+      <label class="profile-option"><input type="checkbox" value="elderly"> Elderly family members (60+)</label>
+      <label class="profile-option"><input type="checkbox" value="asthma"> Asthma or dust allergy</label>
+      <label class="profile-option"><input type="checkbox" value="pregnancy"> Pregnancy</label>
+      <label class="profile-option"><input type="checkbox" value="outdoor"> Outdoor work or daily commute</label>
+      <label class="profile-option"><input type="checkbox" value="fitness"> Morning walk / run / yoga outdoors</label>
+    </div>
+    <div id="planBox" class="plan-box">
+      <div class="plan-title">Your family's plan for today</div>
+      <ul id="planList" class="plan-list"></ul>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Indoor air hacks</h2>
+    <p class="card-intro">On smog days, indoor air decides most of your family's exposure. Start with the purifier size — most homes buy one that is too small.</p>
+    <div class="calc-row">
+      <div class="calc-fields">
+        <label>Room length (ft) <input id="roomLength" type="number" min="1" value="12"></label>
+        <label>Room width (ft) <input id="roomWidth" type="number" min="1" value="10"></label>
+        <label>Ceiling height (ft) <input id="roomHeight" type="number" min="1" value="10"></label>
+        <button id="calcBtn" class="btn btn-primary" type="button">Calculate purifier size</button>
+      </div>
+      <div id="calcResult" class="calc-result">Enter your bedroom size and calculate — that is the room that matters most, because you spend 7–8 hours there every night.</div>
+    </div>
+    <ul class="hack-list">
+      <li><strong>Ventilate only in the clean window.</strong> Open windows during the day's cleanest stretch (shown above) for 20–30 minutes, then close them. Never ventilate early morning in winter smog season — that is usually the dirtiest air of the day.</li>
+      <li><strong>Seal the gaps.</strong> Weather-strip or tape the gaps under doors and around window frames of the bedroom. On severe days this alone can cut indoor PM2.5 noticeably.</li>
+      <li><strong>Wet-mop, don't dry-sweep.</strong> Dry sweeping throws settled dust back into the air. A damp mop and a damp cloth for surfaces keep particles down.</li>
+      <li><strong>Pause the smoke sources.</strong> Agarbatti, dhoop, candles and mosquito coils add a heavy dose of PM2.5 in a closed room. Skip them on days when AQI is above 200.</li>
+      <li><strong>Run the kitchen exhaust while cooking</strong> and for 10 minutes after. Gas and tadka fumes are a major indoor source that most families ignore.</li>
+      <li><strong>Keep the purifier close and the door closed.</strong> A purifier cleans one room, not the whole flat. Place it near the bed, away from walls, and keep that room's door shut.</li>
+      <li><strong>About indoor plants:</strong> they are good for mood, but you would need hundreds to match one small purifier. Spend on the purifier first.</li>
+    </ul>
+  </section>
+
+  <section class="card">
+    <h2>Ask SaafHawa</h2>
+    <p class="card-intro">Ask about masks, exercise, school runs, ventilation or purifiers. Answers use your city's live AQI and your family profile. You can also add your own Gemini API key in Settings below to switch the assistant to Gemini — the key stays in your browser and is never sent anywhere except Google.</p>
+    <div id="chatLog" class="chat-log">
+      <div class="msg msg-bot">Namaste. Ask me anything about today's air — for example, "Can my father go for his morning walk?" or "When should I open the windows?"</div>
+    </div>
+    <form id="chatForm" class="chat-form">
+      <input id="chatInput" type="text" placeholder="Type your question…" autocomplete="off">
+      <button class="btn btn-primary" type="submit">Ask</button>
+    </form>
+    <details class="settings">
+      <summary>Settings — Gemini API key (optional)</summary>
+      <div class="settings-body">
+        <input id="geminiKey" type="password" placeholder="Paste your Gemini API key (optional)">
+        <button id="saveKeyBtn" class="btn btn-secondary" type="button">Save key in this browser</button>
+        <p class="settings-note">Get a free key from Google AI Studio. Without a key, the built-in advisor answers from live AQI data and public-health guidance.</p>
+      </div>
+    </details>
+  </section>
+
+  <section class="card">
+    <h2>Low-emission routine swaps</h2>
+    <p class="card-intro">Small swaps your family can actually keep. Cleaner choices on high-AQI days also mean less time breathing traffic fumes.</p>
+    <ul class="hack-list">
+      <li><strong>Shift, don't cancel, the school run.</strong> If the school allows a slightly later drop on severe days, use the cleaner late-morning window instead of the 7 am smog peak.</li>
+      <li><strong>Pool the commute.</strong> One car for three neighbours going the same way cuts both emissions and each person's roadside exposure time.</li>
+      <li><strong>Choose the inside lane of the park.</strong> Trees and distance from the road edge measurably lower the PM you breathe during a walk.</li>
+      <li><strong>Batch errands into the clean window.</strong> Vegetables, pharmacy and walks in one trip during the cleanest hours beats three trips through peak smog.</li>
+      <li><strong>Keep two clean indoor evenings a week.</strong> Board games, indoor stretches and reading in the purified room replace the evening walk on the worst days — routine saved, lungs saved.</li>
+    </ul>
+  </section>
+
+  <footer class="footer">
+    <p>Air data: Open-Meteo Air Quality API (Copernicus Atmosphere Monitoring Service). AQI shown is the US AQI scale. This tool gives general guidance, not medical advice — for breathing difficulty, please see a doctor.</p>
+    <p>Built for PromptWars Virtual, Challenge 06 — Urban Air Quality Assistant.</p>
+  </footer>
+
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
