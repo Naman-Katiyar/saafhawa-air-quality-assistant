@@ -15,12 +15,12 @@ const state = {
 };
 
 const BANDS = [
-  { max: 50, name: "Good", color: "#2e9e4f", message: "Air is clean today. Enjoy the outdoors — days like this are precious in smog season." },
-  { max: 100, name: "Moderate", color: "#d9a400", message: "Air is acceptable for most people. Sensitive family members should keep outdoor time easy and watch for symptoms." },
-  { max: 150, name: "Unhealthy for sensitive groups", color: "#e07b24", message: "Children, elders and anyone with asthma should cut back on long or heavy outdoor activity today." },
-  { max: 200, name: "Unhealthy", color: "#cf2e2e", message: "Everyone may feel the effects today. Keep outdoor time short, wear a well-fitting N95 outside, and keep the purifier running." },
-  { max: 300, name: "Very unhealthy", color: "#7d3c98", message: "Health alert territory. Avoid outdoor exertion, keep windows closed outside the clean window, and run the purifier on high in the bedroom." },
-  { max: 9999, name: "Hazardous", color: "#7e0023", message: "Emergency-level air. Stay indoors with the purifier running, seal the room, and go out only if essential — with an N95." },
+  { max: 50, name: "Good", color: "#2e9e4f", text: "#10222e", numberColor: "#2e9e4f", message: "Air is clean today. Enjoy the outdoors — days like this are precious in smog season." },
+  { max: 100, name: "Moderate", color: "#d9a400", text: "#10222e", numberColor: "#8a6d00", message: "Air is acceptable for most people. Sensitive family members should keep outdoor time easy and watch for symptoms." },
+  { max: 150, name: "Unhealthy for sensitive groups", color: "#e07b24", text: "#10222e", numberColor: "#9c4a00", message: "Children, elders and anyone with asthma should cut back on long or heavy outdoor activity today." },
+  { max: 200, name: "Unhealthy", color: "#cf2e2e", text: "#ffffff", numberColor: "#cf2e2e", message: "Everyone may feel the effects today. Keep outdoor time short, wear a well-fitting N95 outside, and keep the purifier running." },
+  { max: 300, name: "Very unhealthy", color: "#7d3c98", text: "#ffffff", numberColor: "#7d3c98", message: "Health alert territory. Avoid outdoor exertion, keep windows closed outside the clean window, and run the purifier on high in the bedroom." },
+  { max: 9999, name: "Hazardous", color: "#7e0023", text: "#ffffff", numberColor: "#7e0023", message: "Emergency-level air. Stay indoors with the purifier running, seal the room, and go out only if essential — with an N95." },
 ];
 
 function bandFor(aqi) {
@@ -68,10 +68,11 @@ function renderNow(data) {
   $("nowUpdated").textContent = "Updated " + when + " (local time) · Source: Copernicus / Open-Meteo";
   $("nowMessage").textContent = band.message;
   $("aqiNumber").textContent = state.aqi;
-  $("aqiNumber").style.color = band.color;
+  $("aqiNumber").style.color = band.numberColor;
   const cat = $("aqiCategory");
   cat.textContent = band.name;
   cat.style.background = band.color;
+  cat.style.color = band.text;
   $("pm25Value").textContent = state.pm25 != null ? Math.round(state.pm25) : "—";
   $("pm10Value").textContent = state.pm10 != null ? Math.round(state.pm10) : "—";
   $("maskAdvice").textContent = maskAdvice(state.aqi, false);
@@ -347,7 +348,7 @@ let searchTimer = null;
 async function handleSearchInput() {
   const term = $("cityInput").value.trim();
   const box = $("suggestions");
-  if (term.length < 2) { box.hidden = true; box.innerHTML = ""; return; }
+  if (term.length < 2) { box.hidden = true; box.innerHTML = ""; $("cityInput").setAttribute("aria-expanded", "false"); return; }
   clearTimeout(searchTimer);
   searchTimer = setTimeout(async () => {
     try {
@@ -365,14 +366,17 @@ async function handleSearchInput() {
         b.appendChild(sub);
         b.addEventListener("click", () => {
           box.hidden = true;
+          $("cityInput").setAttribute("aria-expanded", "false");
           $("cityInput").value = r.name;
           loadCity(r.name + (r.admin1 ? ", " + r.admin1 : ""), r.latitude, r.longitude);
         });
         box.appendChild(b);
       });
       box.hidden = !(data.results && data.results.length);
+      $("cityInput").setAttribute("aria-expanded", String(!box.hidden));
     } catch (err) {
       box.hidden = true;
+      $("cityInput").setAttribute("aria-expanded", "false");
     }
   }, 250);
 }
@@ -389,6 +393,12 @@ function handleLocate() {
 
 function init() {
   $("cityInput").addEventListener("input", handleSearchInput);
+  $("cityInput").addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      $("suggestions").hidden = true;
+      $("cityInput").setAttribute("aria-expanded", "false");
+    }
+  });
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".search-field")) $("suggestions").hidden = true;
   });

@@ -28,7 +28,7 @@
     <label class="search-label" for="cityInput">Your city</label>
     <div class="search-row">
       <div class="search-field">
-        <input id="cityInput" type="text" placeholder="Search a city — try Delhi, Kanpur, Lucknow…" autocomplete="off">
+        <input id="cityInput" type="text" placeholder="Search a city — try Delhi, Kanpur, Lucknow…" autocomplete="off" aria-expanded="false" aria-controls="suggestions">
         <div id="suggestions" class="suggestions" hidden></div>
       </div>
       <button id="locateBtn" class="btn btn-secondary" type="button">Use my location</button>
@@ -44,7 +44,7 @@
     <p id="statusLine" class="status-line" role="status"></p>
   </section>
 
-  <section id="nowCard" class="card now-card" hidden>
+  <section id="nowCard" class="card now-card" hidden aria-live="polite">
     <div class="now-main">
       <div>
         <div class="now-city" id="nowCity">—</div>
@@ -65,7 +65,7 @@
     </div>
     <div class="chart-block">
       <div class="chart-title">AQI — next 24 hours</div>
-      <canvas id="aqiChart" height="140"></canvas>
+      <canvas id="aqiChart" height="140" role="img" aria-label="Bar chart of hourly US AQI for the next 24 hours, with the cleanest 3-hour stretch outlined">AQI chart: hourly US AQI bars for the next 24 hours.</canvas>
       <div class="chart-legend"><span class="dot dot-best"></span> Cleanest stretch &nbsp;·&nbsp; Bar colour = AQI category at that hour</div>
     </div>
   </section>
@@ -81,7 +81,7 @@
       <label class="profile-option"><input type="checkbox" value="outdoor"> Outdoor work or daily commute</label>
       <label class="profile-option"><input type="checkbox" value="fitness"> Morning walk / run / yoga outdoors</label>
     </div>
-    <div id="planBox" class="plan-box">
+    <div id="planBox" class="plan-box" aria-live="polite">
       <div class="plan-title">Your family's plan for today</div>
       <ul id="planList" class="plan-list"></ul>
     </div>
@@ -97,7 +97,7 @@
         <label>Ceiling height (ft) <input id="roomHeight" type="number" min="1" value="10"></label>
         <button id="calcBtn" class="btn btn-primary" type="button">Calculate purifier size</button>
       </div>
-      <div id="calcResult" class="calc-result">Enter your bedroom size and calculate — that is the room that matters most, because you spend 7–8 hours there every night.</div>
+      <div id="calcResult" class="calc-result" aria-live="polite">Enter your bedroom size and calculate — that is the room that matters most, because you spend 7–8 hours there every night.</div>
     </div>
     <ul class="hack-list">
       <li><strong>Ventilate only in the clean window.</strong> Open windows during the day's cleanest stretch (shown above) for 20–30 minutes, then close them. Never ventilate early morning in winter smog season — that is usually the dirtiest air of the day.</li>
@@ -113,16 +113,18 @@
   <section class="card">
     <h2>Ask SaafHawa</h2>
     <p class="card-intro">Ask about masks, exercise, school runs, ventilation or purifiers. Answers use your city's live AQI and your family profile. You can also add your own Gemini API key in Settings below to switch the assistant to Gemini — the key stays in your browser and is never sent anywhere except Google.</p>
-    <div id="chatLog" class="chat-log">
+    <div id="chatLog" class="chat-log" aria-live="polite">
       <div class="msg msg-bot">Namaste. Ask me anything about today's air — for example, "Can my father go for his morning walk?" or "When should I open the windows?"</div>
     </div>
     <form id="chatForm" class="chat-form">
+      <label class="sr-only" for="chatInput">Ask about today's air</label>
       <input id="chatInput" type="text" placeholder="Type your question…" autocomplete="off">
       <button class="btn btn-primary" type="submit">Ask</button>
     </form>
     <details class="settings">
       <summary>Settings — Gemini API key (optional)</summary>
       <div class="settings-body">
+        <label class="sr-only" for="geminiKey">Gemini API key (optional)</label>
         <input id="geminiKey" type="password" placeholder="Paste your Gemini API key (optional)">
         <button id="saveKeyBtn" class="btn btn-secondary" type="button">Save key in this browser</button>
         <p class="settings-note">Get a free key from Google AI Studio. Without a key, the built-in advisor answers from live AQI data and public-health guidance.</p>
@@ -149,6 +151,7 @@
 
 </main>
 
+<script src="logic.js"></script>
 <script src="app.js"></script>
 </body>
 </html>
