@@ -20,11 +20,15 @@ It is a static site — no build step, no dependencies.
 
 An internet connection is needed for the live air-quality data.
 
+Run the tests: `node --test`
+
 ## Files
 
 - `index.html` — page structure and content
 - `styles.css` — styling (flat, professional, mobile-friendly)
-- `app.js` — data fetching, AQI logic, plan generator, purifier calculator and the advisor
+- `app.js` — data fetching, rendering and user interaction
+- `logic.js` — pure AQI logic (bands, clean-window scan, purifier sizing, plan builder, advisor), shared by the page and the tests
+- `tests/logic.test.js` — tests for the AQI logic
 
 ## Notes
 
